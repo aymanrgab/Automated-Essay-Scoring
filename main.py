@@ -21,20 +21,16 @@ def main():
         test_processed = preprocessing.preprocess(test_data)
 
         # Extract features
-        train_tfidf, train_grammar, test_tfidf, test_grammar = feature_extraction.extract_features(train_processed, test_processed)
-        
-        # Combine features
-        train_combined = sp.hstack((train_tfidf, train_grammar.to_numpy().reshape(-1, 1)))
-        test_combined = sp.hstack((test_tfidf, test_grammar.to_numpy().reshape(-1, 1)))
+        train_features, test_features = feature_extraction.extract_features(train_processed, test_processed)
 
         # Train model
-        trained_model, X_test, y_test = model.train(train_combined, train_data['score'])
+        trained_model, X_test, y_test = model.train(train_features, train_data['score'])
 
         # Evaluate model
-        evaluate.evaluate_model(trained_model, X_test, y_test)
+        evaluate.evaluate_model(trained_model, X_test, y_test, train_processed)
 
         # Make predictions on test data
-        test_predictions = trained_model.predict(test_combined)
+        test_predictions = trained_model.predict(test_features)
 
         # Create submission file
         submission = pd.DataFrame({

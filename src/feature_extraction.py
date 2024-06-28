@@ -1,17 +1,8 @@
+import scipy.sparse as sp
 from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
 import spacy
-import subprocess
-import sys
-
-def load_spacy_model():
-    try:
-        return spacy.load('en_core_web_sm')
-    except OSError:
-        print("Downloading spaCy model. This may take a while...")
-        subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
-        return spacy.load('en_core_web_sm')
-
-nlp = load_spacy_model()
+nlp = spacy.load("en_core_web_sm")
 
 def extract_features(train_data, test_data=None):
     # TF-IDF features
@@ -40,4 +31,33 @@ def extract_features(train_data, test_data=None):
     else:
         test_grammar = None
     
-    return train_tfidf, train_grammar, test_tfidf, test_grammar
+    # POS, NER, and Sentiment features
+    train_pos = train_data['pos_tags'].apply(lambda x: len(x.split()))
+    train_ner = train_data['named_entities'].apply(lambda x: len(x.split()))
+    train_sentiment = train_data['sentiment']
+    
+    if test_data is not None:
+        test_pos = test_data['pos_tags'].apply(lambda x: len(x.split()))
+        test_ner = test_data['named_entities'].apply(lambda x: len(x.split()))
+        test_sentiment = test_data['sentiment']
+    else:
+        test_pos = None
+        test_ner = None
+        test_sentiment = None
+
+    train_combined = sp.hstack((train_tfidf, 
+                                np.array(train_grammar).reshape(-1, 1), 
+                                np.array(train_pos).reshape(-1, 1), 
+                                np.array(train_ner).reshape(-1, 1), 
+                                np.array(train_sentiment).reshape(-1, 1)))
+    
+    if test_data is not None:
+        test_combined = sp.hstack((test_tfidf, 
+                                   np.array(test_grammar).reshape(-1, 1), 
+                                   np.array(test_pos).reshape(-1, 1), 
+                                   np.array(test_ner).reshape(-1, 1), 
+                                   np.array(test_sentiment).reshape(-1, 1)))
+    else:
+        test_combined = None
+
+    return train_combined, test_combined
