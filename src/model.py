@@ -55,7 +55,7 @@ def train(features, target, model_name='best_model.joblib'):
 
         for name, model_info in models.items():
             print(f"Training {name} model...")
-            grid_search = GridSearchCV(model_info['model'], model_info['params'], cv=5, scoring='r2', n_jobs=-1, n_iter=10)
+            grid_search = GridSearchCV(model_info['model'], model_info['params'], cv=5, scoring='r2', n_jobs=-1)
             grid_search.fit(X_train, y_train)
 
             if grid_search.best_score_ > best_score:
