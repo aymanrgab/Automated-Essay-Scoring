@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV
 import joblib
 import os
 
@@ -55,7 +55,7 @@ def train(features, target, model_name='best_model.joblib'):
 
         for name, model_info in models.items():
             print(f"Training {name} model...")
-            grid_search = RandomizedSearchCV(model_info['model'], model_info['params'], cv=5, scoring='r2', n_jobs=-1, n_iter=10)
+            grid_search = GridSearchCV(model_info['model'], model_info['params'], cv=5, scoring='r2', n_jobs=-1, n_iter=10)
             grid_search.fit(X_train, y_train)
 
             if grid_search.best_score_ > best_score:
