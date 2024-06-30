@@ -1,5 +1,4 @@
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split, GridSearchCV
 import joblib
 import os
@@ -38,14 +37,6 @@ def train(features, target, model_name='best_model.joblib'):
                     'max_depth': [None, 5],
                     'min_samples_split': [2, 5],
                     'min_samples_leaf': [1, 2]
-                }
-            },
-            'support_vector': {
-                'model': SVR(),
-                'params': {
-                    'C': [0.1, 1],
-                    'kernel': ['linear'],
-                    'gamma': ['scale']
                 }
             }
         }
